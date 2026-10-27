@@ -1,9 +1,10 @@
+import { Suspense } from "react"; // ✅ Agregado Suspense
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
-import { InstallButton } from "@/components/pwa/InstallButton"; // <-- Importado
+import { InstallButton } from "@/components/pwa/InstallButton";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   },
   description:
     "Tienda de equipamiento deportivo para mujeres que se forjan y se hacen más fuertes cada día. Balones, pesas, accesorios y más. Envíos a todo Colombia.",
-  manifest: "/manifest.json", // <-- Manifiesto agregado
+  manifest: "/manifest.json",
   metadataBase: new URL("https://forja.example.com"),
   icons: {
     icon: "/favicon.ico",
@@ -61,8 +62,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
         <SiteFooter />
         
-        {/* ✅ PUNTO 3: Botón de Instalación PWA justo antes de cerrar el body */}
-        <InstallButton />
+        {/* ✅ Envuelto en Suspense para evitar errores en páginas estáticas como /404 */}
+        <Suspense fallback={null}>
+          <InstallButton />
+        </Suspense>
         
       </body>
     </html>
