@@ -1,26 +1,97 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  /* Colores de marca FORJA - Rosa (inspirado en el logo) */
+  --color-brand-pink-50: #FFF0F7;
+  --color-brand-pink-100: #FFE0EF;
+  --color-brand-pink-200: #FFC1DF;
+  --color-brand-pink-300: #FF94C7;
+  --color-brand-pink-400: #FF69AD;
+  --color-brand-pink-500: #FF3D9A;
+  --color-brand-pink-600: #E81D7E;
+  --color-brand-pink-700: #C71065;
+  --color-brand-pink-800: #A10D52;
+  --color-brand-pink-900: #7A0A3F;
+  --color-brand-pink-950: #4A0626;
+
+  /* Colores de marca FORJA - Morado (inspirado en el logo) */
+  --color-brand-purple-50: #F5F0FF;
+  --color-brand-purple-100: #EDE0FF;
+  --color-brand-purple-200: #DDB8FF;
+  --color-brand-purple-300: #C77DFF;
+  --color-brand-purple-400: #B25CFF;
+  --color-brand-purple-500: #A855F7;
+  --color-brand-purple-600: #9333EA;
+  --color-brand-purple-700: #7E22CE;
+  --color-brand-purple-800: #6B21A8;
+  --color-brand-purple-900: #581C87;
+  --color-brand-purple-950: #3B0764;
+
+  /* Colores neutrales (se mantienen, funcionan perfecto) */
+  --color-brand-neutral-50: #F7F8FA;
+  --color-brand-neutral-100: #ECEEF2;
+  --color-brand-neutral-200: #D9DCE3;
+  --color-brand-neutral-300: #B9BEC9;
+  --color-brand-neutral-400: #8A91A0;
+  --color-brand-neutral-500: #5C6474;
+  --color-brand-neutral-600: #3F4654;
+  --color-brand-neutral-700: #2A2F3A;
+  --color-brand-neutral-800: #1A1D25;
+  --color-brand-neutral-900: #0E1016;
+
+  /* Colores base */
+  --color-background: #ffffff;
+  --color-foreground: #1A1D25;
+
+  /* Fuentes */
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl
+           bg-brand-pink-500 px-5 py-3 text-sm font-semibold text-white
+           transition hover:bg-brand-pink-600
+           focus:outline-none focus:ring-2 focus:ring-brand-pink-400
+           focus:ring-offset-2 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl
+           border border-brand-purple-900/15 bg-white px-5 py-3 text-sm
+           font-semibold text-brand-purple-900 transition
+           hover:bg-brand-purple-50 focus:outline-none focus:ring-2
+           focus:ring-brand-purple-400 focus:ring-offset-2;
+  }
 }
+/* Animaciones personalizadas para FORJA */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+  50% { transform: translateY(-30px) rotate(10deg) scale(1.05); }
+}
+.animate-float { animation: float 8s ease-in-out infinite; }
+
+@keyframes float-logo {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+.animate-float-logo { animation: float-logo 4s ease-in-out infinite; }
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+.animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+
+@keyframes shadow-pulse {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.4; }
+  50% { transform: translateX(-50%) scale(0.8); opacity: 0.2; }
+}
+.animate-shadow-pulse { animation: shadow-pulse 4s ease-in-out infinite; }
