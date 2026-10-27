@@ -8,7 +8,7 @@ import {
   Paintbrush,
   MessageCircle,
   ArrowRight,
-  ShoppingBag,
+  Clock,
 } from "lucide-react";
 import { getActiveProducts } from "@/services/products";
 import { formatCOP, getFinalPrice, getDiscountPercentage } from "@/lib/utils/format";
@@ -58,7 +58,26 @@ const benefits = [
 
 export default async function HomePage() {
   const allProducts = await getActiveProducts();
-  const featuredProducts = allProducts.slice(0, 4);
+
+  // 1. Agrupar productos por categoría
+  const groupedProducts = allProducts.reduce((acc, product) => {
+    const cat = product.categoryId || "otros";
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(product);
+    return acc;
+  }, {} as Record<string, typeof allProducts>);
+
+  // 2. Ordenar por precio (menor a mayor) y tomar los 5 más económicos de cada línea
+  const featuredByCategory: Record<string, typeof allProducts> = {};
+  for (const [category, products] of Object.entries(groupedProducts)) {
+    featuredByCategory[category] = products
+      .sort((a, b) => {
+        const priceA = getFinalPrice(a.price, a.promotionalPrice);
+        const priceB = getFinalPrice(b.price, b.promotionalPrice);
+        return priceA - priceB;
+      })
+      .slice(0, 5); // Máximo 5 por categoría
+  }
 
   return (
     <>
@@ -146,86 +165,108 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* PRODUCTOS DESTACADOS */}
+      {/* PRODUCTOS DESTACADOS (5 más económicos por línea) */}
       <section className="bg-brand-neutral-50 py-16">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between">
+          <div className="mb-8">
             <h2 className="text-2xl font-bold tracking-tight text-brand-purple-900 sm:text-3xl">
-              Destacados
+              Las mejores ofertas por categoría
             </h2>
-            <Link
-              href="/catalogo"
-              className="text-sm font-semibold text-brand-pink-500 hover:text-brand-pink-600"
-            >
-              Ver todo →
-            </Link>
+            <p className="mt-1 text-sm text-brand-neutral-500">
+              Encuentra los 5 artículos más económicos de cada línea.
+            </p>
           </div>
 
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6">
-            {featuredProducts.map((product) => {
-              const finalPrice = getFinalPrice(product.price, product.promotionalPrice);
-              const discount = getDiscountPercentage(product.price, product.promotionalPrice);
-              const mainImage = product.images[0] || "/logo_final.jpeg";
-              const isOutOfStock = product.stock <= 0;
+          {Object.entries(featuredByCategory).map(([categoryId, products]) => {
+            if (products.length === 0) return null;
+            
+            const categoryTitle = categoryId === "balones" ? "Balones y Accesorios" : 
+                                  categoryId === "pesas" ? "Pesas y Mancuernas" : 
+                                  categoryId.charAt(0).toUpperCase() + categoryId.slice(1);
 
-              return (
-                <article
-                  key={product.id}
-                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-neutral-200 bg-white transition hover:-translate-y-1 hover:shadow-soft"
-                >
+            return (
+              <div key={categoryId} className="mb-12 last:mb-0">
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-lg font-bold text-brand-pink-500">
+                    {categoryTitle}
+                  </h3>
                   <Link
-                    href={`/producto/${product.slug}`}
-                    className="relative block aspect-square overflow-hidden bg-brand-neutral-100"
+                    href={`/catalogo?cat=${categoryId}`}
+                    className="text-sm font-semibold text-brand-purple-900 hover:text-brand-pink-500 transition"
                   >
-                    <Image
-                      src={mainImage}
-                      alt={product.name}
-                      fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                    />
-                    {discount && (
-                      <span className="absolute left-3 top-3 rounded-full bg-brand-pink-500 px-2.5 py-1 text-xs font-bold text-white shadow-md">
-                        -{discount}%
-                      </span>
-                    )}
-                    {isOutOfStock && (
-                      <span className="absolute right-3 top-3 rounded-full bg-brand-neutral-800/90 px-2.5 py-1 text-xs font-semibold text-white shadow-md">
-                        Agotado
-                      </span>
-                    )}
+                    Ver todos →
                   </Link>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 lg:gap-6">
+                  {products.map((product) => {
+                    const finalPrice = getFinalPrice(product.price, product.promotionalPrice);
+                    const discount = getDiscountPercentage(product.price, product.promotionalPrice);
+                    const mainImage = product.images[0] || "/logo_final.jpeg";
+                    const isOutOfStock = product.stock <= 0;
 
-                  <div className="flex flex-1 flex-col p-4">
-                    <Link href={`/producto/${product.slug}`}>
-                      <h3 className="line-clamp-2 text-sm font-semibold text-brand-purple-900 transition group-hover:text-brand-pink-500">
-                        {product.name}
-                      </h3>
-                    </Link>
+                    return (
+                      <article
+                        key={product.id}
+                        className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-neutral-200 bg-white transition hover:-translate-y-1 hover:shadow-soft"
+                      >
+                        <Link
+                          href={`/producto/${product.slug}`}
+                          className="relative block aspect-square overflow-hidden bg-brand-neutral-100"
+                        >
+                          <Image
+                            src={mainImage}
+                            alt={product.name}
+                            fill
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                            className="object-cover transition duration-500 group-hover:scale-105"
+                          />
+                          {discount && (
+                            <span className="absolute left-3 top-3 rounded-full bg-brand-pink-500 px-2.5 py-1 text-xs font-bold text-white shadow-md">
+                              -{discount}%
+                            </span>
+                          )}
+                          {product.stock <= 0 && (
+  <span className="absolute right-3 top-3 rounded-full bg-brand-neutral-800/90 px-2.5 py-1 text-xs font-semibold text-white shadow-md flex items-center gap-1">
+    <Clock className="h-3 w-3" />
+    Bajo pedido (5-7 días)
+  </span>
+)}
+                        </Link>
 
-                    <div className="mt-2 flex items-baseline gap-2">
-                      <span className="text-base font-bold text-brand-purple-900 sm:text-lg">
-                        {formatCOP(finalPrice)}
-                      </span>
-                      {discount && (
-                        <span className="text-xs text-brand-neutral-400 line-through sm:text-sm">
-                          {formatCOP(product.price)}
-                        </span>
-                      )}
-                    </div>
+                        <div className="flex flex-1 flex-col p-4">
+                          <Link href={`/producto/${product.slug}`}>
+                            <h3 className="line-clamp-2 text-sm font-semibold text-brand-purple-900 transition group-hover:text-brand-pink-500">
+                              {product.name}
+                            </h3>
+                          </Link>
 
-                    {!isOutOfStock && product.stock <= 5 && (
-                      <p className="mt-1 text-xs font-medium text-brand-pink-600">
-                        ¡Solo {product.stock} disponibles!
-                      </p>
-                    )}
+                          <div className="mt-2 flex items-baseline gap-2">
+                            <span className="text-base font-bold text-brand-purple-900 sm:text-lg">
+                              {formatCOP(finalPrice)}
+                            </span>
+                            {discount && (
+                              <span className="text-xs text-brand-neutral-400 line-through sm:text-sm">
+                                {formatCOP(product.price)}
+                              </span>
+                            )}
+                          </div>
 
-                    <AddToCartButton product={product} />
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+                          {!isOutOfStock && product.stock <= 5 && (
+                            <p className="mt-1 text-xs font-medium text-brand-pink-600">
+                              ¡Solo {product.stock} disponibles!
+                            </p>
+                          )}
+
+                          <AddToCartButton product={product} />
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 

@@ -23,10 +23,10 @@ export const useCartStore = create<CartState>()(
           
           if (existingItem) {
             const newQuantity = existingItem.quantity + item.quantity;
-            // Validar contra el inventario máximo
-            if (newQuantity > maxStock) {
-              alert(`Solo hay ${maxStock} unidades disponibles de este producto.`);
-              return state; // No hacer cambios si excede el stock
+            // ✅ Si maxStock es 0, es bajo pedido, permitimos agregar. Si no, validamos.
+            if (maxStock > 0 && newQuantity > maxStock) {
+              alert(`Solo hay ${maxStock} unidades disponibles en inventario inmediato.`);
+              return state;
             }
             
             return {
@@ -36,9 +36,9 @@ export const useCartStore = create<CartState>()(
             };
           }
 
-          // Validar al agregar un item nuevo
-          if (item.quantity > maxStock) {
-            alert(`Solo hay ${maxStock} unidades disponibles de este producto.`);
+          // ✅ Misma lógica para el primer agregado
+          if (maxStock > 0 && item.quantity > maxStock) {
+            alert(`Solo hay ${maxStock} unidades disponibles en inventario inmediato.`);
             return state;
           }
 
@@ -57,8 +57,9 @@ export const useCartStore = create<CartState>()(
           get().removeItem(productId);
           return;
         }
-        if (quantity > maxStock) {
-          alert(`Solo hay ${maxStock} unidades disponibles.`);
+        // ✅ Validación respetando el stock 0 como bajo pedido
+        if (maxStock > 0 && quantity > maxStock) {
+          alert(`Solo hay ${maxStock} unidades disponibles en inventario inmediato.`);
           return;
         }
         set((state) => ({
@@ -79,7 +80,7 @@ export const useCartStore = create<CartState>()(
       },
     }),
     {
-      name: "FORJA-cart-storage", // Nombre de la clave en localStorage
+      name: "FORJA-cart-storage",
       storage: createJSONStorage(() => localStorage),
     }
   )

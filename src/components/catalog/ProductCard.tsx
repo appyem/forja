@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag } from "lucide-react";
+import { Clock } from "lucide-react"; // ✅ Clock agregado correctamente
 import type { Product } from "@/lib/types";
 import { formatCOP, getFinalPrice, getDiscountPercentage } from "@/lib/utils/format";
+import { AddToCartButton } from "@/components/cart/AddToCartButton"; // ✅ Usamos el botón inteligente
 
 interface ProductCardProps {
   product: Product;
@@ -11,8 +12,8 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const finalPrice = getFinalPrice(product.price, product.promotionalPrice);
   const discount = getDiscountPercentage(product.price, product.promotionalPrice);
-  const mainImage = product.images[0] || "/logo-FORJA.png";
-  const isOutOfStock = product.stock <= 0;
+  const mainImage = product.images[0] || "/logo_final.jpeg";
+  const isPreOrder = product.stock <= 0;
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-2xl border border-brand-neutral-200 bg-white transition hover:-translate-y-1 hover:shadow-soft">
@@ -37,10 +38,11 @@ export function ProductCard({ product }: ProductCardProps) {
           </span>
         )}
 
-        {/* Badge de sin stock */}
-        {isOutOfStock && (
-          <span className="absolute right-3 top-3 rounded-full bg-brand-neutral-800/90 px-2.5 py-1 text-xs font-semibold text-white shadow-md">
-            Agotado
+        {/* Badge de bajo pedido */}
+        {isPreOrder && (
+          <span className="absolute right-3 top-3 rounded-full bg-brand-neutral-800/90 px-2.5 py-1 text-xs font-semibold text-white shadow-md flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            Bajo pedido (5-7 días)
           </span>
         )}
       </Link>
@@ -66,21 +68,14 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Stock disponible */}
-        {!isOutOfStock && product.stock <= 5 && (
+        {!isPreOrder && product.stock <= 5 && (
           <p className="mt-1 text-xs font-medium text-brand-pink-600">
             ¡Solo {product.stock} disponibles!
           </p>
         )}
 
-        {/* Botón agregar al carrito */}
-        <button
-          type="button"
-          disabled={isOutOfStock}
-          className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-purple-900 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-purple-800 disabled:cursor-not-allowed disabled:bg-brand-neutral-300"
-        >
-          <ShoppingBag className="h-4 w-4" aria-hidden="true" />
-          {isOutOfStock ? "Sin stock" : "Agregar"}
-        </button>
+        {/* ✅ Botón unificado que maneja "Agregar" o "Bajo pedido" automáticamente */}
+        <AddToCartButton product={product} />
       </div>
     </article>
   );
