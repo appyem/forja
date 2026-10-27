@@ -1,0 +1,24 @@
+{
+  "name": "FORJA - Más fuertes cada día",
+  "short_name": "FORJA",
+  "description": "Equipamiento deportivo diseñado para mujeres que se forjan y se hacen más fuertes cada día.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF3D9A",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/logo_final.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo_final.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

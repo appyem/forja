@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { InstallButton } from "@/components/pwa/InstallButton"; // <-- Importado
 
 const inter = Inter({
   variable: "--font-inter",
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
   },
   description:
     "Tienda de equipamiento deportivo para mujeres que se forjan y se hacen más fuertes cada día. Balones, pesas, accesorios y más. Envíos a todo Colombia.",
+  manifest: "/manifest.json", // <-- Manifiesto agregado
   metadataBase: new URL("https://forja.example.com"),
   icons: {
     icon: "/favicon.ico",
@@ -36,7 +38,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FF3D9A", // Nuevo color rosa de la marca
+  themeColor: "#FF3D9A",
   width: "device-width",
   initialScale: 1,
 };
@@ -58,6 +60,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <SiteFooter />
+        
+        {/* ✅ PUNTO 3: Botón de Instalación PWA justo antes de cerrar el body */}
+        <InstallButton />
+        
       </body>
     </html>
   );
