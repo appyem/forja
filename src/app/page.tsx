@@ -14,6 +14,7 @@ import { getActiveProducts } from "@/services/products";
 import { formatCOP, getFinalPrice, getDiscountPercentage } from "@/lib/utils/format";
 import { FloatingBows } from "@/components/decorations/FloatingBows";
 import { AnimatedLogo } from "@/components/decorations/AnimatedLogo";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
 
 const categories = [
   {
@@ -219,14 +220,7 @@ export default async function HomePage() {
                       </p>
                     )}
 
-                    <button
-                      type="button"
-                      disabled={isOutOfStock}
-                      className="mt-3 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-purple-900 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-purple-800 disabled:cursor-not-allowed disabled:bg-brand-neutral-300"
-                    >
-                      <ShoppingBag className="h-4 w-4" aria-hidden="true" />
-                      {isOutOfStock ? "Sin stock" : "Agregar"}
-                    </button>
+                    <AddToCartButton product={product} />
                   </div>
                 </article>
               );
